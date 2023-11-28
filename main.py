@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 from pyopencl import *
-from random import randint, random
+from random import randint, random, choice
 from os import environ
 import time
 
@@ -33,7 +33,8 @@ Vector2D = np.dtype([
 Particle = np.dtype([
     ("position", Vector2D),
     ("velocity", Vector2D),
-    ("orbit", Vector2D)])
+    ("orbit", Vector2D),
+    ("color", RGB)])
 
 
 # Create window.
@@ -66,6 +67,7 @@ typedef struct particle {
     Vector2D position;
     Vector2D velocity;
     Vector2D orbit;
+    RGB color;
 } Particle;
 
 
@@ -102,7 +104,7 @@ __kernel void update_particles(
     position.y = particles[gid].position.y + particles[gid].velocity.y;
 
     // New Particle.
-    Particle new_particle = {position, velocity, particles[gid].orbit};
+    Particle new_particle = {position, velocity, particles[gid].orbit, particles[gid].color};
     new_particles[gid] = new_particle;
 
     // Color pixel if on screen.
@@ -112,11 +114,10 @@ __kernel void update_particles(
     if (x < 0 || x >= width) return;
     if (y < 0 || y >= height) return;
 
-    surfarray[(y * width) + x].r = 255;
-    surfarray[(y * width) + x].g = 255;
-    surfarray[(y * width) + x].b = 255;
+    surfarray[(y * width) + x].r = particles[gid].color.r;
+    surfarray[(y * width) + x].g = particles[gid].color.g;
+    surfarray[(y * width) + x].b = particles[gid].color.b;
 }
-
 """).build()
 __update_particles = __update_particles.update_particles
 
@@ -143,20 +144,27 @@ def update_particles(particles) -> np.array:
 
 # Simulation variables.
 center = [width//2, height//2]
-n_particles = 100000
+n_particles = 500000
 running = True
 
 frames = "frames.npy"
 total_frames = 1 * 60
-
-with open(frames, "w"):
-    # Just cleaning the file.
-    pass
+##
+##with open(frames, "w"):
+##    # Just cleaning the file.
+##    pass
 
 
 # Information handling.
 now = time.time()
 last = 0
+
+orbits = [
+    [width // 2, height // 2],
+    [0, 0],
+    [width, 0],
+    [0, height],
+    [width, height]]
 
 # Create particles.
 particles = np.zeros((n_particles,), dtype=Particle)
@@ -165,8 +173,12 @@ for i in range(n_particles):
     particles[i]["position"]["y"] = randint(0, height)
     particles[i]["velocity"]["x"] = random() - 0.5
     particles[i]["velocity"]["y"] = random() - 0.5
-    particles[i]["orbit"]["x"] = width // 2
-    particles[i]["orbit"]["y"] = height // 2
+    orbit = choice(orbits) # [randint(0, width), randint(0, height)]
+    particles[i]["orbit"]["x"] = orbit[0]
+    particles[i]["orbit"]["y"] = orbit[1]
+    particles[i]["color"]["r"] = randint(0, 255)
+    particles[i]["color"]["g"] = randint(0, 255)
+    particles[i]["color"]["b"] = randint(0, 255)
 
 # Pre compute frames.
 while running:
