@@ -39,14 +39,16 @@ Particle = np.dtype([
 
 # Create window.
 pygame.init()
-width = 500
-height = 500
+width = 700
+height = 700
 window = pygame.display.set_mode((width, height))
 window_alpha = window.convert_alpha()
 width = window.get_width()
 height = window.get_height()
 
-render_buffer = np.zeros((width, height), dtype=RGB)
+print(width, height)
+
+render_buffer = np.zeros((height, height), dtype=RGB)
 
 # GPU Compute Particle function.
 __update_particles = Program(context, """
@@ -88,20 +90,20 @@ __kernel void update_particles(
     // Normalise the force vector.
     float mag = sqrt((force.x * force.x) + (force.y * force.y));
 
-    if (mag > 0.0f) {
-        force.x = force.x / mag;
-        force.y = force.y / mag;
-    }
+    force.x = force.x / mag * 3;
+    force.y = force.y / mag * 3;
+
+    float friction = 0.995f;
 
     // New Velocity.
     Vector2D velocity;
-    velocity.x = (particles[gid].velocity.x + force.x);
-    velocity.y = (particles[gid].velocity.y + force.y);
+    velocity.x = (particles[gid].velocity.x + force.x) * friction;
+    velocity.y = (particles[gid].velocity.y + force.y) * friction;
 
     // New Position.
     Vector2D position;
-    position.x = particles[gid].position.x + particles[gid].velocity.x;
-    position.y = particles[gid].position.y + particles[gid].velocity.y;
+    position.x = particles[gid].position.x + velocity.x;
+    position.y = particles[gid].position.y + velocity.y;
 
     // New Particle.
     Particle new_particle = {position, velocity, particles[gid].orbit, particles[gid].color};
@@ -122,13 +124,13 @@ __kernel void update_particles(
     int g = 255 - value;
     int b = 255 - value;
 
-    surfarray[(y * width) + x].r = r;
-    surfarray[(y * width) + x].g = g;
-    surfarray[(y * width) + x].b = b;
+    surfarray[(x * width) + y].r = 255;
+    surfarray[(x * width) + y].g = 0;
+    surfarray[(x * width) + y].b = 0;
     
-    //surfarray[(y * width) + x].r = particles[gid].color.r;
-    //surfarray[(y * width) + x].g = particles[gid].color.g;
-    //surfarray[(y * width) + x].b = particles[gid].color.b;
+    // surfarray[(y * width) + x].r = particles[gid].color.r;
+    // surfarray[(y * width) + x].g = particles[gid].color.g;
+    // surfarray[(y * width) + x].b = particles[gid].color.b;
 }
 """).build()
 __update_particles = __update_particles.update_particles
@@ -156,7 +158,7 @@ def update_particles(particles) -> np.array:
 
 # Simulation variables.
 center = [width//2, height//2]
-n_particles = 500000
+n_particles = 300000
 running = True
 
 frames = "frames.npy"
@@ -172,7 +174,7 @@ now = time.time()
 last = 0
 
 orbits = [
-    [width // 2, height // 2]]#,
+    [width // 2, height // 2]]
 ##    [0, 0],
 ##    [width, 0],
 ##    [0, height],
@@ -181,10 +183,10 @@ orbits = [
 # Create particles.
 particles = np.zeros((n_particles,), dtype=Particle)
 for i in range(n_particles):
-    particles[i]["position"]["x"] = randint(0, width // 2)
-    particles[i]["position"]["y"] = randint(0, height // 2)
-    particles[i]["velocity"]["x"] = random() - 0.5
-    particles[i]["velocity"]["y"] = 5
+    particles[i]["position"]["x"] = randint(int(0.4 * width), int(0.6 * width))
+    particles[i]["position"]["y"] = randint(int(0.4 * height), int(0.6 * height))
+    particles[i]["velocity"]["x"] = choice([-30, 30])
+    particles[i]["velocity"]["y"] = choice([-30, 30])
     orbit = choice(orbits) # [randint(0, width), randint(0, height)]
     particles[i]["orbit"]["x"] = orbit[0]
     particles[i]["orbit"]["y"] = orbit[1]
