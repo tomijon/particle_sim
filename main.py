@@ -39,8 +39,8 @@ Particle = np.dtype([
 
 # Create window.
 pygame.init()
-width = 700
-height = 700
+width = 500
+height = 500
 window = pygame.display.set_mode((width, height))
 window_alpha = window.convert_alpha()
 width = window.get_width()
@@ -108,15 +108,27 @@ __kernel void update_particles(
     new_particles[gid] = new_particle;
 
     // Color pixel if on screen.
-    int x = (int) particles[gid].position.x;
-    int y = (int) particles[gid].position.y;
+    int x = (int) position.x;
+    int y = (int) position.y;
     
     if (x < 0 || x >= width) return;
     if (y < 0 || y >= height) return;
 
-    surfarray[(y * width) + x].r = particles[gid].color.r;
-    surfarray[(y * width) + x].g = particles[gid].color.g;
-    surfarray[(y * width) + x].b = particles[gid].color.b;
+    int value = (int) mag;
+    if (mag > 255) {
+        value = 255;
+    }
+    int r = 255 - value;
+    int g = 255 - value;
+    int b = 255 - value;
+
+    surfarray[(y * width) + x].r = r;
+    surfarray[(y * width) + x].g = g;
+    surfarray[(y * width) + x].b = b;
+    
+    //surfarray[(y * width) + x].r = particles[gid].color.r;
+    //surfarray[(y * width) + x].g = particles[gid].color.g;
+    //surfarray[(y * width) + x].b = particles[gid].color.b;
 }
 """).build()
 __update_particles = __update_particles.update_particles
@@ -160,19 +172,19 @@ now = time.time()
 last = 0
 
 orbits = [
-    [width // 2, height // 2],
-    [0, 0],
-    [width, 0],
-    [0, height],
-    [width, height]]
+    [width // 2, height // 2]]#,
+##    [0, 0],
+##    [width, 0],
+##    [0, height],
+##    [width, height]]
 
 # Create particles.
 particles = np.zeros((n_particles,), dtype=Particle)
 for i in range(n_particles):
-    particles[i]["position"]["x"] = randint(0, width)
-    particles[i]["position"]["y"] = randint(0, height)
+    particles[i]["position"]["x"] = randint(0, width // 2)
+    particles[i]["position"]["y"] = randint(0, height // 2)
     particles[i]["velocity"]["x"] = random() - 0.5
-    particles[i]["velocity"]["y"] = random() - 0.5
+    particles[i]["velocity"]["y"] = 5
     orbit = choice(orbits) # [randint(0, width), randint(0, height)]
     particles[i]["orbit"]["x"] = orbit[0]
     particles[i]["orbit"]["y"] = orbit[1]
