@@ -38,7 +38,9 @@ Particle = np.dtype([
 
 # Create window.
 pygame.init()
-window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+width = 700
+height = 700
+window = pygame.display.set_mode((width, height))
 window_alpha = window.convert_alpha()
 width = window.get_width()
 height = window.get_height()
@@ -141,11 +143,11 @@ def update_particles(particles) -> np.array:
 
 # Simulation variables.
 center = [width//2, height//2]
-n_particles = 100
+n_particles = 100000
 running = True
 
 frames = "frames.npy"
-total_frames = 10 * 60
+total_frames = 1 * 60
 
 with open(frames, "w"):
     # Just cleaning the file.
@@ -154,7 +156,7 @@ with open(frames, "w"):
 
 # Information handling.
 now = time.time()
-last = now
+last = 0
 
 # Create particles.
 particles = np.zeros((n_particles,), dtype=Particle)
@@ -167,8 +169,9 @@ for i in range(n_particles):
     particles[i]["orbit"]["y"] = height // 2
 
 # Pre compute frames.
-for i in range(total_frames):
-    print(f"{i + 1}/{total_frames}")
+while running:
+##    now = time.time()
+##    print(f"{i + 1}/{total_frames} Updates/s = {1 / (now - last)}")
     # Update particles.
     particles = update_particles(particles)
 
@@ -178,29 +181,39 @@ for i in range(total_frames):
     render_buffer_3d[:,:,1] = render_buffer['g']
     render_buffer_3d[:,:,2] = render_buffer['b']
     render_buffer = np.zeros_like(render_buffer)
+    frame = pygame.surfarray.make_surface(render_buffer_3d)
 
-    with open(frames, "ab") as file:
-        np.save(file, render_buffer_3d)
-    
-    
-with open(frames, "rb") as file:
-    while True:
-        try:
-            frame = np.load(file)
-            frame = pygame.surfarray.make_surface(frame)
-            # Draw particles.
-            window.fill(BG)
-            window.blit(frame, (0, 0))
-            pygame.display.update()
-            
-        except:
-            break
+    # Draw particles.
+    window.fill(BG)
+    window.blit(frame, (0, 0))
+    pygame.display.update()
 
-        # Event handling.
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    running = False
+    # Event handling.
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+
+##    with open(frames, "ab") as file:
+##        np.save(file, render_buffer_3d)
+##    last = now    
+    
+##    
+##with open(frames, "rb") as file:
+##    while True:
+##        try:
+##            frame = np.load(file)
+##            frame = pygame.surfarray.make_surface(frame)
+##            # Draw particles.
+##            window.fill(BG)
+##            window.blit(frame, (0, 0))
+##            pygame.display.update()
+##            
+##        except:
+##            break
+##
+##        
 
 pygame.quit()
