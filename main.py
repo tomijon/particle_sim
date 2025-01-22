@@ -15,6 +15,7 @@ COPY_HOST_PTR = mem_flags.COPY_HOST_PTR
 
 # Set default mode for pyopencl to use.
 environ["PYOPENCL_CTX"] = "0"
+environ["PYOPENCL_COMPILER_OUTPUT"] = "1"
 
 # Opencl context.
 context = create_some_context()
@@ -161,24 +162,12 @@ center = [width//2, height//2]
 n_particles = 300000
 running = True
 
-frames = "frames.npy"
-total_frames = 1 * 60
-##
-##with open(frames, "w"):
-##    # Just cleaning the file.
-##    pass
-
-
 # Information handling.
 now = time.time()
 last = 0
 
 orbits = [
     [width // 2, height // 2]]
-##    [0, 0],
-##    [width, 0],
-##    [0, height],
-##    [width, height]]
 
 # Create particles.
 particles = np.zeros((n_particles,), dtype=Particle)
@@ -187,7 +176,7 @@ for i in range(n_particles):
     particles[i]["position"]["y"] = randint(int(0.4 * height), int(0.6 * height))
     particles[i]["velocity"]["x"] = choice([-30, 30])
     particles[i]["velocity"]["y"] = choice([-30, 30])
-    orbit = choice(orbits) # [randint(0, width), randint(0, height)]
+    orbit = choice(orbits)
     particles[i]["orbit"]["x"] = orbit[0]
     particles[i]["orbit"]["y"] = orbit[1]
     particles[i]["color"]["r"] = randint(0, 255)
@@ -196,8 +185,6 @@ for i in range(n_particles):
 
 # Pre compute frames.
 while running:
-##    now = time.time()
-##    print(f"{i + 1}/{total_frames} Updates/s = {1 / (now - last)}")
     # Update particles.
     particles = update_particles(particles)
 
@@ -221,25 +208,5 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-
-##    with open(frames, "ab") as file:
-##        np.save(file, render_buffer_3d)
-##    last = now    
-    
-##    
-##with open(frames, "rb") as file:
-##    while True:
-##        try:
-##            frame = np.load(file)
-##            frame = pygame.surfarray.make_surface(frame)
-##            # Draw particles.
-##            window.fill(BG)
-##            window.blit(frame, (0, 0))
-##            pygame.display.update()
-##            
-##        except:
-##            break
-##
-##        
 
 pygame.quit()
