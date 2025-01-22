@@ -8,7 +8,7 @@ This project was practice for writing compute shaders and for writing highly par
 
 ## Screenshots
 
-<img src="C:\Users\thoma\AppData\Roaming\Typora\typora-user-images\image-20250122132346494.png" alt="image-20250122132346494" style="zoom:50%;" /><img src="C:\Users\thoma\AppData\Roaming\Typora\typora-user-images\image-20250122132405566.png" alt="image-20250122132405566" style="zoom:50%;" />
+<img src="/Screenshots/1.png" style="zoom:50%;"/><img src="/Screenshots/2.png" style="zoom:50%;"/>
 
 ## Technical Stuff
 
