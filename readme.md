@@ -2,13 +2,19 @@
 
 ## Overview
 
-A simple particle simulation written in Python. Particles are spawned anywhere on the screen and are given a coordinate to "orbit". Particles move towards the orbit point they have been assigned. It can handle up to approximately 300,000 particles.
+A simple particle simulation written in Python. Particles are spawned in specialised locations on the screen and are given a coordinate to "orbit". This allows for interesting patterns to be created. Particles move towards the orbit point they have been assigned. It can handle up to approximately 300,000 particles.
 
 This project was practice for writing compute shaders and for writing highly parallelised problems.
 
 ## Screenshots
 
-<img src="/Screenshots/1.png" width="256"/><img src="/Screenshots/2.png" width="256"/>
+One example of a particle pattern.
+
+<img src="/Screenshots/1.png" width="256"/>
+
+Inevitable result of the above pattern.
+
+<img src="/Screenshots/2.png" width="256"/>
 
 ## Technical Stuff
 
