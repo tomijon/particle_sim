@@ -8,7 +8,7 @@ This project was practice for writing compute shaders and for writing highly par
 
 ## Screenshots
 
-<img src="/Screenshots/1.png" style="zoom:50%;"/><img src="/Screenshots/2.png" style="zoom:50%;"/>
+<img src="/Screenshots/1.png" width="256"/><img src="/Screenshots/2.png" width="256"/>
 
 ## Technical Stuff
 
