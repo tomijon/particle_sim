@@ -2,9 +2,13 @@
 
 ## Overview
 
-A simple particle simulation written in Python. Particles are spawned anywhere on the screen and are given a coordinate to "orbit". Particles move towards the orbit point they have been assigned.
+A simple particle simulation written in Python. Particles are spawned anywhere on the screen and are given a coordinate to "orbit". Particles move towards the orbit point they have been assigned. It can handle up to approximately 300,000 particles.
 
 This project was practice for writing compute shaders and for writing highly parallelised problems.
+
+## Screenshots
+
+<img src="C:\Users\thoma\AppData\Roaming\Typora\typora-user-images\image-20250122132346494.png" alt="image-20250122132346494" style="zoom:50%;" /><img src="C:\Users\thoma\AppData\Roaming\Typora\typora-user-images\image-20250122132405566.png" alt="image-20250122132405566" style="zoom:50%;" />
 
 ## Technical Stuff
 
